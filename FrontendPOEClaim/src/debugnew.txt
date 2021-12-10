@@ -1,0 +1,51 @@
+/* eslint-disable */
+// React and Semantic UI elements.
+import React, { useState, useEffect } from 'react';
+import { Form, Input, Grid, Message } from 'semantic-ui-react';
+
+// Pre-built Substrate front-end utilities for connecting to a node
+// and making a transaction.
+import { useSubstrate } from './substrate-lib';
+
+// Main Proof Of Existence component is exported.
+export function Main (props) {
+  // Establish an API to talk to the Substrate node.
+  const { api } = useSubstrate();
+  // Get the selected user from the `AccountSelector` component.
+  const { accountPair } = props;
+  // React hooks for all the state variables we track.
+  // Learn more at: https://reactjs.org/docs/hooks-intro.html
+  useEffect(() => {
+    let unsubscribe;
+    // Polkadot-JS API query to the `proofs` storage item in our pallet.
+    // This is a subscription, so it will always get the latest value,
+    // even if it changes.
+    api.query.templateModule
+      .proofs(digest, result => {
+        // Our storage item returns a tuple, which is represented as an array.
+      })
+      .then(unsub => {
+        unsubscribe = unsub;
+      });
+    return () => unsubscribe && unsubscribe();
+    // This tells the React hook to update whenever the file digest changes
+    // (when a new file is chosen), or when the storage subscription says the
+    // value of the storage item has updated.
+  }, [digest, api.query.templateModule]);
+
+  // We can say a file digest is claimed if the stored block number is not 0
+
+  // The actual UI elements which are returned from our component.
+  return (
+    <Grid.Column width={8}>
+      <h1>Proof of Existence</h1>
+    </Grid.Column>
+  );
+}
+
+export default function TemplateModule (props) {
+  const { api } = useSubstrate();
+  return api.query.templateModule && api.query.templateModule.proofs
+    ? <Main {...props} />
+    : null;
+}
