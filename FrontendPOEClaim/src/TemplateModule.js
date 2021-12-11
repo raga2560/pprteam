@@ -18,14 +18,19 @@ export function Main (props) {
   const { api } = useSubstrate();
   // Get the selected user from the `AccountSelector` component.
   const { accountPair } = props;
-	 const [currentValue, setCurrentValue] = useState(0);
+  const [currentValue, setCurrentValue] = useState(0);
 
   const [formValue, setFormValue] = useState(0);
    const [status, setStatus] = useState('');
   const [digest, setDigest] = useState('');
+  const [lock, setLock] = useState('');
+
+  const [lockowner, setLockowner] = useState('');
+  const [lockvalue, setLockvalue] = useState('');
   const [owner, setOwner] = useState('');
   const [block, setBlock] = useState(0);
   // Our `FileReader()` which is accessible from our functions below.
+
   let fileReader;
   // Takes our file, and creates a digest using the Blake2 256 hash function
   const bufferToDigest = () => {
@@ -64,6 +69,22 @@ export function Main (props) {
     return () => unsubscribe && unsubscribe();
   }, [digest, api.query.templateModule]);
 
+  useEffect(() => {
+    let unsubscribe;
+    api.query.templateModule.prooflocks(digest, newValue => {
+      // The storage value is an Option<u32>
+      // So we have to check whether it is None first
+      // There is also unwrapOr
+        setLockowner(newValue[0].toString());
+        setLockvalue(newValue[1].toString());
+
+    }).then(unsub => {
+      unsubscribe = unsub;
+    })
+      .catch(console.error);
+
+    return () => unsubscribe && unsubscribe();
+  }, [digest, api.query.templateModule]);
    // We can say a file digest is claimed if the stored block number is not 0
   function isClaimed () {
     return block !== 0;
@@ -95,6 +116,25 @@ export function Main (props) {
             list={[digest, `Owner: ${owner}`, `Block: ${block}`]}
           />
         </Form.Field>
+
+        <Form.Field>
+	  <label>
+            Enter lock :
+            <input
+              name="lock"
+              type="text"
+              value={lock}
+              onChange={(e)=> setLock(e.target.value)}
+            />
+          <Message
+            warning
+            header="File Digest locked"
+            list={[digest, `Owner: ${lockowner}`, `Lock: ${lockvalue}`]}
+          />
+          </label>
+
+        </Form.Field>
+
 	   {/* Buttons for interacting with the component. */}
         <Form.Field>
           {/* Button to create a claim. Only active if a file is selected, and not already claimed. Updates the `status`. */}
@@ -122,11 +162,24 @@ export function Main (props) {
             attrs={{
               palletRpc: 'templateModule',
               callable: 'updateClaim',
-              inputParams: [digest],
-              paramFields: [true]
+              inputParams: [digest, lock],
+              paramFields: [true, true]
             }}
           />
 
+          <TxButton
+            accountPair={accountPair}
+            label={'Lock Claim'}
+            setStatus={setStatus}
+            type="SIGNED-TX"
+            disabled={!isClaimed() || !digest}
+            attrs={{
+              palletRpc: 'templateModule',
+              callable: 'lockClaim',
+              inputParams: [digest, lock],
+              paramFields: [true, true]
+            }}
+          />
 	   {/* Button to revoke a claim. Only active if a file is selected, and is already claimed. Updates the `status`. */}
           <TxButton
             accountPair={accountPair}

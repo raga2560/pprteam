@@ -29,6 +29,8 @@ pub mod pallet {
 
 		UpdateCreated(T::AccountId, Vec<u8>),
 
+		ClaimLocked(T::AccountId, Vec<u8>),
+
         PshAddressCreated(T::AccountId, Vec<u8>),
 	}
 
@@ -40,6 +42,12 @@ pub mod pallet {
 		NoSuchProof,
 		/// The proof is claimed by another account, so caller can't revoke it.
 		NotProofOwner,
+
+		ProofAlreadyLocked,
+
+		ProofNotClaimed,
+
+		InvalidLock,
 	}
 
 	#[pallet::pallet]
@@ -51,6 +59,9 @@ pub mod pallet {
 
 	#[pallet::storage] // <-- Step 5. code block will replace this.
 	pub(super) type P2shaddress<T: Config> = StorageMap<_, Blake2_128Concat, Vec<u8>, (T::AccountId, T::BlockNumber), ValueQuery>;
+
+	#[pallet::storage] // <-- Step 5. code block will replace this.
+	pub(super) type Prooflocks<T: Config> = StorageMap<_, Blake2_128Concat, Vec<u8>, (T::AccountId, Vec<u8> ), ValueQuery>;
 
 	#[pallet::hooks]
 	impl<T: Config> Hooks<BlockNumberFor<T>> for Pallet<T> {}
@@ -90,6 +101,7 @@ pub mod pallet {
 		pub fn update_claim(
 			origin: OriginFor<T>,
 			proof: Vec<u8>,
+			sentlock: Vec<u8>,
 		) -> DispatchResult {
 			// Check that the extrinsic was signed and get the signer.
 			// This function will return an error if the extrinsic is not signed.
@@ -101,6 +113,11 @@ pub mod pallet {
 
 			  // Get owner of the claim.
 			  let (owner, current_block) = Proofs::<T>::get(&proof);
+
+			  let (_, lock) = Prooflocks::<T>::get(&proof);
+
+			ensure!(sentlock != lock, Error::<T>::InvalidLock);
+
 			  if sender != owner {
 			    Proofs::<T>::insert(&proof, (&sender, current_block));
               }
@@ -118,6 +135,34 @@ pub mod pallet {
 
 			// Emit an event that the claim was created.
 			Self::deposit_event(Event::UpdateCreated(sender, proof));
+
+			Ok(())
+		}
+
+		#[pallet::weight(1_000)]
+		pub fn lock_claim(
+			origin: OriginFor<T>,
+			proof: Vec<u8>,
+			lock: Vec<u8>,
+		) -> DispatchResult {
+			// Check that the extrinsic was signed and get the signer.
+			// This function will return an error if the extrinsic is not signed.
+			// https://docs.substrate.io/v3/runtime/origins
+			let sender = ensure_signed(origin)?;
+
+        ensure!(!Prooflocks::<T>::contains_key(&proof), Error::<T>::ProofAlreadyLocked);
+        ensure!(Proofs::<T>::contains_key(&proof), Error::<T>::ProofNotClaimed);
+
+			let (owner, _) = Proofs::<T>::get(&proof);
+
+			// Verify that sender of the current call is the claim owner.
+			ensure!(sender == owner, Error::<T>::NotProofOwner);
+
+		    Prooflocks::<T>::insert(&proof, (&sender, &lock));
+                
+
+			// Emit an event that the claim was created.
+			Self::deposit_event(Event::ClaimLocked(sender, lock));
 
 			Ok(())
 		}
