@@ -1,7 +1,7 @@
 /* eslint-disable */
 // React and Semantic UI elements.
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Grid, Message } from 'semantic-ui-react';
+import { Feed, Form, Input, Grid, Message } from 'semantic-ui-react';
 
 // Pre-built Substrate front-end utilities for connecting to a node
 // and making a transaction.
@@ -11,11 +11,20 @@ import { TxButton } from './substrate-lib/components';
 
 // Polkadot-JS utilities for hashing data.
 import { blake2AsHex } from '@polkadot/util-crypto';
+const FILTERED_EVENTS = [
+  'system:ExtrinsicSuccess::(phase={"applyExtrinsic":0})'
+];
+
+const eventName = ev => `${ev.section}:${ev.method}`;
+const eventParams = ev => JSON.stringify(ev.data);
+
 
 // Main Proof Of Existence component is exported.
 export function Main (props) {
   // Establish an API to talk to the Substrate node.
   const { api } = useSubstrate();
+   const [eventFeed, setEventFeed] = useState([]);
+
   // Get the selected user from the `AccountSelector` component.
   const { accountPair } = props;
   const [currentValue, setCurrentValue] = useState(0);
@@ -49,6 +58,37 @@ export function Main (props) {
     fileReader.readAsArrayBuffer(file);
   };
 
+   useEffect(() => {
+    let unsub = null;
+    let keyNum = 0;
+    const allEvents = async () => {
+      unsub = await api.query.system.events(events => {
+        // loop through the Vec<EventRecord>
+        events.forEach(record => {
+          // extract the phase, event and the event types
+          const { event, phase } = record;
+
+          // show what we are busy with
+          const evHuman = event.toHuman();
+          const evName = eventName(evHuman);
+          const evParams = eventParams(evHuman);
+          const evNamePhase = `${evName}::(phase=${phase.toString()})`;
+
+          if (FILTERED_EVENTS.includes(evNamePhase)) return;
+  setEventFeed(e => [{
+            key: keyNum,
+            icon: 'bell',
+            summary: evName,
+            content: evParams
+          }, ...e]);
+
+          keyNum += 1;
+        });
+      });
+    };
+   allEvents();
+    return () => unsub && unsub();
+  }, [api.query.system]);
 
   // React hooks for all the state variables we track.
   // Learn more at: https://reactjs.org/docs/hooks-intro.html
@@ -198,6 +238,7 @@ export function Main (props) {
         {/* Status message about the transaction. */}
 
    <div style={{ overflowWrap: 'break-word' }}>{status}</div>
+    <Feed style={{ clear: 'both', overflow: 'auto', maxHeight: 100 }} events={eventFeed} />
       </Form>
 
     </Grid.Column>
