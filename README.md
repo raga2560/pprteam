@@ -32,7 +32,7 @@ After implementing, the ported application will run on substrate framework, in s
 
 The complete scope of usage looks like below
 
-- https://github.com/raga2560/pprteam/blob/main/getcertificate.pdf
+- https://drive.google.com/file/d/10-yiU9BE3kD7wk5gEdcogMJK46HW18Su/view?usp=sharing
 
 
 
