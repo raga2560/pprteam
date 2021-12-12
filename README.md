@@ -45,4 +45,12 @@ GITHUB link
 
 Image of working sample 
 
+<img  src="https://github.com/raga2560/pprteam/blob/main/images/locked.png" alt="alt text" width="400">
+
+- The image shows updated claim
+- Lock entered
+- Full lock feature is still not working as expected. (we are freshers in rust and react)
+- Will improve
+
+
 
