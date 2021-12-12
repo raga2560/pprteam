@@ -17,7 +17,8 @@ For this purpose we are creating proof of concept.
 
 By doing this applications can certify on blockchain like below
 
-<img  src="https://github.com/raga2560/pprteam/blob/main/images/lockedcertificatepng" alt="alt text" width="400">
+https://github.com/raga2560/pprteam/blob/main/images/certificate.jpeg
+<img  src="https://github.com/raga2560/pprteam/blob/main/images/certificate.jpeg" alt="alt text" width="400">
 
 Document validation by email, OTP, via Blockchain 
 
