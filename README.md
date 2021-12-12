@@ -46,6 +46,8 @@ The complete scope of usage looks like below
 ## 3-5min Pitch Video Link
 
 - To be added
+[![Pitch document ](https://img.youtube.com/vi/_9rkGyxBd_c/0.jpg)](https://www.youtube.com/watch?v=_9rkGyxBd_c "Pitch document ")
+
 
 ## Github Repo Link 
 
