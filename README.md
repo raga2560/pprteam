@@ -10,6 +10,8 @@ Improved proof of existence sample
 
 ## Project Summary (3-5 lines overview of the team's project)
 
+### Description
+
 The goal is to create a proof of concept that can be used for document validation. We already have a app using DASH. We need to port it to substrate framework.
 
 For this purpose we are creating proof of concept.
@@ -20,7 +22,7 @@ By doing this applications can certify on blockchain like below
 https://github.com/raga2560/pprteam/blob/main/images/certificate.jpeg
 <img  src="https://github.com/raga2560/pprteam/blob/main/images/certificate.jpeg" alt="alt text" width="400">
 
-Document validation by email, OTP, via Blockchain 
+This has document validation by email, OTP, via Blockchain 
 
 It requires P2SH type of locking.
 
@@ -45,7 +47,7 @@ The complete scope of usage looks like below
 
 - To be added
 
-## Github Repo Link (created by the team leader; must contain a readme file containing project name & min. 150 words description)
+## Github Repo Link 
 
 GITHUB link 
 
@@ -68,8 +70,6 @@ Image of working sample
 
 - The image shows updated claim
 - Lock entered
-- Full lock feature is still not working as expected. (we are freshers in rust and react)
-- Will improve
 
 
 
