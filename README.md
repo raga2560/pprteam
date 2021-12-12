@@ -10,10 +10,28 @@ Improved proof of existence sample
 
 ## Project Summary (3-5 lines overview of the team's project)
 
-The goal is to create a proof of concept that can be used for 
-- Document validation by email, OTP, via Blockchain (similar to https://app.thepaybox.biz/)
-- It requires P2SH type of locking.
+The goal is to create a proof of concept that can be used for document validation. We already have a app using DASH. We need to port it to substrate framework.
+
+For this purpose we are creating proof of concept.
+
+
+By doing this applications can certify on blockchain like below
+
+<img  src="https://github.com/raga2560/pprteam/blob/main/images/lockedcertificatepng" alt="alt text" width="400">
+
+Document validation by email, OTP, via Blockchain 
+
+It requires P2SH type of locking.
+
 - The effort is in that direction
+
+After implementing, the ported application will run on substrate framework, in selendra blockchain.
+
+The complete scope of usage looks like below
+
+- "https://github.com/raga2560/pprteam/blob/main/getcertificate.pdf
+
+
 
 ### Achieved
 
